@@ -1,0 +1,38 @@
+"""Conversation state definitions and event triggers."""
+
+from enum import Enum
+
+
+class ConversationState(str, Enum):
+    """Formal states for the autonomous sales qualification and booking lifecycle."""
+
+    NEW = "NEW"
+    GREETING = "GREETING"
+    DISCOVERY = "DISCOVERY"
+    QUALIFICATION = "QUALIFICATION"
+    NEEDS_INFORMATION = "NEEDS_INFORMATION"
+    QUALIFIED = "QUALIFIED"
+    NOT_QUALIFIED = "NOT_QUALIFIED"
+    BOOKING = "BOOKING"
+    BOOKED = "BOOKED"
+    CLOSED = "CLOSED"
+    HUMAN_HANDOFF = "HUMAN_HANDOFF"
+    PROCESSING_ERROR = "PROCESSING_ERROR"
+
+
+class ConversationEvent(str, Enum):
+    """Events driving transitions within the ConversationFSM."""
+
+    INBOUND_MESSAGE = "INBOUND_MESSAGE"
+    GREETING_SENT = "GREETING_SENT"
+    DISCOVERY_COMPLETED = "DISCOVERY_COMPLETED"
+    NEEDS_INFO_TRIGGERED = "NEEDS_INFO_TRIGGERED"
+    INFO_PROVIDED = "INFO_PROVIDED"
+    QUALIFIED = "QUALIFIED"
+    DISQUALIFIED = "DISQUALIFIED"
+    SLOT_OFFERED = "SLOT_OFFERED"
+    SLOT_CONFIRMED = "SLOT_CONFIRMED"
+    WORKFLOW_COMPLETED = "WORKFLOW_COMPLETED"
+    REQUEST_HUMAN = "REQUEST_HUMAN"
+    RESUME_BOT = "RESUME_BOT"
+    ERROR_OCCURRED = "ERROR_OCCURRED"
