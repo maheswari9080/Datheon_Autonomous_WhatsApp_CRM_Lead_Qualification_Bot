@@ -7,6 +7,7 @@
 [![Pydantic V2](https://img.shields.io/badge/Pydantic-V2-E92063?style=for-the-badge&logo=pydantic&logoColor=white)](https://docs.pydantic.dev/)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0%20Async-D71F00?style=for-the-badge&logo=sqlalchemy&logoColor=white)](https://docs.sqlalchemy.org/)
 [![Tests](https://img.shields.io/badge/Tests-39%2F39%20Passed%20(100%25)-10B981?style=for-the-badge&logo=pytest&logoColor=white)]()
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-2563EB?style=for-the-badge&logo=github&logoColor=white)](https://maheswari9080.github.io/Datheon_Autonomous_WhatsApp_CRM_Lead_Qualification_Bot/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](./LICENSE)
 
 <br/>
@@ -18,10 +19,11 @@
   Ingests inbound WhatsApp webhooks, extracts structured BANT criteria, prevents hallucinations with strict guardrails, locks and books real-time calendar demonstration slots, and guarantees CRM synchronization via the Transactional Outbox pattern.
 </p>
 
+[**🌐 Launch Live Web Portal**](https://maheswari9080.github.io/Datheon_Autonomous_WhatsApp_CRM_Lead_Qualification_Bot/) •
 [**Read Architecture**](#1-architectural-blueprint--light-infographic) •
 [**Live Demo Mockup**](#2-conversational-journey--lead-dossier-mockup) •
 [**STRIDE Security**](#4-stride-threat-model--defense-matrix) •
-[**Quickstart Guide**](#5-quickstart--local-setup) •
+[**Deployment Guide**](#5-live-web-portal--github-pages-deployment) •
 [**LinkedIn Post Guide**](./linkedin.md) •
 [**License**](./LICENSE)
 
@@ -157,7 +159,34 @@ stateDiagram-v2
 
 ---
 
-## 5. Quickstart & Local Setup
+## 5. Live Web Portal & GitHub Pages Deployment
+
+The full interactive showcase portal is designed to be hosted on **GitHub Pages**:
+
+🌐 **Live URL**: [`https://maheswari9080.github.io/Datheon_Autonomous_WhatsApp_CRM_Lead_Qualification_Bot/`](https://maheswari9080.github.io/Datheon_Autonomous_WhatsApp_CRM_Lead_Qualification_Bot/)
+
+### Enabling GitHub Pages in Repository Settings:
+Navigate to your repository settings at:  
+`https://github.com/maheswari9080/Datheon_Autonomous_WhatsApp_CRM_Lead_Qualification_Bot/settings/pages`
+
+You can select either of the two standard publishing sources:
+
+#### Option A: Deploy from a branch (Direct / Immediate)
+1. Under **Build and deployment** > **Source**, choose **Deploy from a branch**.
+2. Under **Branch**:
+   - Select: **`main`**
+   - Folder: **`/docs`**
+3. Click **Save**. GitHub Pages will be live within 60 seconds!
+
+#### Option B: GitHub Actions (Automated CI/CD)
+1. Under **Build and deployment** > **Source**, choose **GitHub Actions**.
+2. The repository includes [`.github/workflows/pages.yml`](./.github/workflows/pages.yml), which automatically:
+   - Validates that all 39 unit/integration/E2E tests pass via `pytest`.
+   - Packages and deploys `/docs` to GitHub Pages on every push to `main`.
+
+---
+
+## 6. Quickstart & Local Setup
 
 ### Prerequisites
 - Python 3.12+
@@ -201,7 +230,7 @@ docker compose up --build
 
 ---
 
-## 6. Automated Test Suite Execution (TDD)
+## 7. Automated Test Suite Execution (TDD)
 
 Execute all 39 automated tests covering unit, integration, and end-to-end user journeys:
 
@@ -265,7 +294,7 @@ tests/unit/test_webhook.py::test_deduplicator_lru_cache PASSED
 
 ---
 
-## 7. Social & Promotional Media
+## 8. Social & Promotional Media
 
 - **LinkedIn Post Guide**: Detailed announcement copy, hashtags, and strategy in [`linkedin.md`](./linkedin.md).
 - **Showcase Image**: Root attachment ready for social posting: [`image.png`](./image.png).
@@ -273,6 +302,6 @@ tests/unit/test_webhook.py::test_deduplicator_lru_cache PASSED
 
 ---
 
-## 8. License
+## 9. License
 
 This project is licensed under the **[MIT License](./LICENSE)** - Copyright (c) 2026 Maheswari.
