@@ -61,10 +61,14 @@ class CalComCalendarAdapter(CalendarAdapterProtocol):
                 slot_end = current_slot_start + timedelta(minutes=self.slot_duration)
                 if current_slot_start >= earliest_time:
                     slot_id = f"calcom_{current_slot_start.strftime('%Y%m%d_%H%M')}"
-                    is_colliding = any(
-                        ev["start_time"] < slot_end and ev["end_time"] > current_slot_start
-                        for ev in self._booked_events.values()
-                    )
+                    is_colliding = False
+                    for ev in self._booked_events.values():
+                        ev_start = datetime.fromisoformat(ev["start_time"]) if isinstance(ev["start_time"], str) else ev["start_time"]
+                        ev_end = datetime.fromisoformat(ev["end_time"]) if isinstance(ev["end_time"], str) else ev["end_time"]
+                        if ev_start < slot_end and ev_end > current_slot_start:
+                            is_colliding = True
+                            break
+
                     if not is_colliding:
                         display = current_slot_start.strftime("%a, %b %d at %I:%M %p UTC")
                         slots.append(
@@ -89,7 +93,9 @@ class CalComCalendarAdapter(CalendarAdapterProtocol):
     ) -> dict[str, Any]:
         """Create confirmed Cal.com booking."""
         for ev in self._booked_events.values():
-            if ev["start_time"] < end_time and ev["end_time"] > start_time:
+            ev_start = datetime.fromisoformat(ev["start_time"]) if isinstance(ev["start_time"], str) else ev["start_time"]
+            ev_end = datetime.fromisoformat(ev["end_time"]) if isinstance(ev["end_time"], str) else ev["end_time"]
+            if ev_start < end_time and ev_end > start_time:
                 raise CalendarSlotUnavailableError("Slot unavailable on Cal.com")
 
         event_id = f"cal_{uuid.uuid4().hex[:10]}"
@@ -98,8 +104,8 @@ class CalComCalendarAdapter(CalendarAdapterProtocol):
             "provider": "calcom",
             "lead_name": lead_name,
             "lead_phone": lead_phone,
-            "start_time": start_time,
-            "end_time": end_time,
+            "start_time": start_time.isoformat() if isinstance(start_time, datetime) else str(start_time),
+            "end_time": end_time.isoformat() if isinstance(end_time, datetime) else str(end_time),
             "summary": summary,
             "meeting_url": f"https://cal.com/booking/{event_id}",
             "status": "CONFIRMED",

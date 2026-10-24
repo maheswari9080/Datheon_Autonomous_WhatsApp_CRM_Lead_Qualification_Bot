@@ -68,10 +68,13 @@ class GoogleCalendarAdapter(CalendarAdapterProtocol):
                     slot_id = f"slot_{current_slot_start.strftime('%Y%m%d_%H%M')}"
 
                     # Check collision against booked events
-                    is_colliding = any(
-                        ev["start_time"] < slot_end and ev["end_time"] > current_slot_start
-                        for ev in self._booked_events.values()
-                    )
+                    is_colliding = False
+                    for ev in self._booked_events.values():
+                        ev_start = datetime.fromisoformat(ev["start_time"]) if isinstance(ev["start_time"], str) else ev["start_time"]
+                        ev_end = datetime.fromisoformat(ev["end_time"]) if isinstance(ev["end_time"], str) else ev["end_time"]
+                        if ev_start < slot_end and ev_end > current_slot_start:
+                            is_colliding = True
+                            break
 
                     if not is_colliding:
                         display = current_slot_start.strftime("%a, %b %d at %I:%M %p UTC")
@@ -99,7 +102,9 @@ class GoogleCalendarAdapter(CalendarAdapterProtocol):
         """Create confirmed calendar event with collision guard."""
         # Double-check collision immediately before creating event (STRIDE / Concurrency check)
         for ev in self._booked_events.values():
-            if ev["start_time"] < end_time and ev["end_time"] > start_time:
+            ev_start = datetime.fromisoformat(ev["start_time"]) if isinstance(ev["start_time"], str) else ev["start_time"]
+            ev_end = datetime.fromisoformat(ev["end_time"]) if isinstance(ev["end_time"], str) else ev["end_time"]
+            if ev_start < end_time and ev_end > start_time:
                 raise CalendarSlotUnavailableError(
                     f"Selected slot {start_time.isoformat()} was just booked by another user."
                 )
@@ -112,8 +117,8 @@ class GoogleCalendarAdapter(CalendarAdapterProtocol):
             "provider": "google",
             "lead_name": lead_name,
             "lead_phone": lead_phone,
-            "start_time": start_time,
-            "end_time": end_time,
+            "start_time": start_time.isoformat() if isinstance(start_time, datetime) else str(start_time),
+            "end_time": end_time.isoformat() if isinstance(end_time, datetime) else str(end_time),
             "summary": summary,
             "meeting_url": meeting_url,
             "status": "CONFIRMED",

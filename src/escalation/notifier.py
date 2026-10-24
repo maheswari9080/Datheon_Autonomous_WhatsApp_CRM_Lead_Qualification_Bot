@@ -31,6 +31,7 @@ class EscalationNotifier:
             logger.info(f"Duplicate escalation alert suppressed for incident {incident_id}")
             return False
 
+        budget_val = dossier.get("budget") or 0.0
         message_blocks = {
             "text": f"🚨 Human Handoff Alert: {phone_number}",
             "blocks": [
@@ -43,10 +44,10 @@ class EscalationNotifier:
                     "fields": [
                         {"type": "mrkdwn", "text": f"*Phone:*\n{phone_number}"},
                         {"type": "mrkdwn", "text": f"*Trigger Reason:*\n{reason}"},
-                        {"type": "mrkdwn", "text": f"*Lead Name:*\n{dossier.get('contact_name', 'Unknown')}"},
-                        {"type": "mrkdwn", "text": f"*Company:*\n{dossier.get('company_name', 'Unknown')}"},
-                        {"type": "mrkdwn", "text": f"*Budget:*\n${dossier.get('budget', 0):,.2f}"},
-                        {"type": "mrkdwn", "text": f"*Qualification Status:*\n{dossier.get('qualification_status', 'NEW')}"},
+                        {"type": "mrkdwn", "text": f"*Lead Name:*\n{dossier.get('contact_name') or 'Unknown'}"},
+                        {"type": "mrkdwn", "text": f"*Company:*\n{dossier.get('company_name') or 'Unknown'}"},
+                        {"type": "mrkdwn", "text": f"*Budget:*\n${budget_val:,.2f}"},
+                        {"type": "mrkdwn", "text": f"*Qualification Status:*\n{dossier.get('qualification_status') or 'NEW'}"},
                     ],
                 },
                 {

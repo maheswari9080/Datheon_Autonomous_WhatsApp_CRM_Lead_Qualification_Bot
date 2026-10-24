@@ -16,12 +16,17 @@ LEGAL_TRANSITIONS: dict[ConversationState, set[ConversationState]] = {
     },
     ConversationState.GREETING: {
         ConversationState.DISCOVERY,
+        ConversationState.QUALIFICATION,
+        ConversationState.NEEDS_INFORMATION,
+        ConversationState.QUALIFIED,
         ConversationState.HUMAN_HANDOFF,
         ConversationState.PROCESSING_ERROR,
     },
     ConversationState.DISCOVERY: {
         ConversationState.QUALIFICATION,
         ConversationState.NEEDS_INFORMATION,
+        ConversationState.QUALIFIED,
+        ConversationState.NOT_QUALIFIED,
         ConversationState.HUMAN_HANDOFF,
         ConversationState.PROCESSING_ERROR,
     },
@@ -34,6 +39,8 @@ LEGAL_TRANSITIONS: dict[ConversationState, set[ConversationState]] = {
     },
     ConversationState.NEEDS_INFORMATION: {
         ConversationState.QUALIFICATION,
+        ConversationState.QUALIFIED,
+        ConversationState.NOT_QUALIFIED,
         ConversationState.DISCOVERY,
         ConversationState.HUMAN_HANDOFF,
         ConversationState.PROCESSING_ERROR,
