@@ -98,5 +98,7 @@ async def ingest_webhook(
         extra={"extra_fields": {"correlation_id": correlation_id, "object": payload.get("object")}},
     )
 
-    # Note: background worker dispatch hook will be connected in subsequent commit
+    from src.webhook.dispatcher import process_inbound_webhook
+    background_tasks.add_task(process_inbound_webhook, payload, correlation_id)
+
     return {"status": "received", "correlation_id": correlation_id}
