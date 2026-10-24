@@ -1,13 +1,10 @@
 """E2E Test: Full Lead Qualification, Calendar Booking, and CRM Synchronization Journey."""
 
-import json
 import pytest
 from httpx import AsyncClient
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import get_settings
-from src.core.security import compute_whatsapp_signature
 from src.crm.outbox import TransactionalOutboxWorker
 from src.database.models import BookingRecord, Conversation, Lead, OutboxEvent
 from src.database.session import async_session_factory

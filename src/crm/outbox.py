@@ -1,7 +1,8 @@
 """Transactional Outbox processor for reliable asynchronous integration delivery."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -30,7 +31,7 @@ class TransactionalOutboxWorker:
             status="PENDING",
             retry_count=0,
             max_retries=max_retries,
-            next_retry_at=datetime.now(timezone.utc),
+            next_retry_at=datetime.now(UTC),
         )
         db.add(event)
         await db.flush()
@@ -73,7 +74,7 @@ class TransactionalOutboxWorker:
                 lead = lead_res.scalar_one_or_none()
                 if lead:
                     lead.external_crm_id = res.get("external_record_id")
-                    lead.crm_synced_at = datetime.now(timezone.utc)
+                    lead.crm_synced_at = datetime.now(UTC)
 
             elif event.event_type == "WHATSAPP_DISPATCH":
                 # WhatsApp outbound message dispatcher hook
@@ -82,14 +83,16 @@ class TransactionalOutboxWorker:
                 logger.info(f"[Outbox Dispatch] Outbound WhatsApp sent to {recipient}: {body}")
 
             elif event.event_type == "ESCALATION_ALERT":
-                logger.info(f"[Outbox Dispatch] Escalation notification dispatched: {event.payload}")
+                logger.info(
+                    f"[Outbox Dispatch] Escalation notification dispatched: {event.payload}"
+                )
 
             else:
                 raise ValueError(f"Unsupported outbox event type: {event.event_type}")
 
             # Mark processed
             event.status = "PROCESSED"
-            event.processed_at = datetime.now(timezone.utc)
+            event.processed_at = datetime.now(UTC)
             event.last_error = None
             return True
 
@@ -104,15 +107,15 @@ class TransactionalOutboxWorker:
             else:
                 event.status = "FAILED"
                 # Exponential backoff: 2, 4, 8, 16 seconds
-                delay_sec = 2 ** event.retry_count
-                event.next_retry_at = datetime.now(timezone.utc) + timedelta(seconds=delay_sec)
+                delay_sec = 2**event.retry_count
+                event.next_retry_at = datetime.now(UTC) + timedelta(seconds=delay_sec)
 
             return False
 
     @classmethod
     async def process_pending_events(cls, db: AsyncSession, limit: int = 20) -> int:
         """Poll and execute pending and failed outbox events ready for retry."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         stmt = (
             select(OutboxEvent)
             .where(

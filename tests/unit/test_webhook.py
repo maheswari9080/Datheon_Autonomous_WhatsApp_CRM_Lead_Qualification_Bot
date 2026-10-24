@@ -1,8 +1,10 @@
 """Unit and integration tests for WhatsApp webhook lifecycle and deduplication."""
 
 import json
+
 import pytest
 from httpx import AsyncClient
+
 from src.core.config import get_settings
 from src.core.security import compute_whatsapp_signature
 from src.webhook.deduplicator import MessageDeduplicator
@@ -50,7 +52,9 @@ async def test_post_webhook_valid_signature(async_client: AsyncClient):
                         "value": {
                             "messaging_product": "whatsapp",
                             "metadata": {"phone_number_id": "10001"},
-                            "contacts": [{"profile": {"name": "Alice Johnson"}, "wa_id": "15551234567"}],
+                            "contacts": [
+                                {"profile": {"name": "Alice Johnson"}, "wa_id": "15551234567"}
+                            ],
                             "messages": [
                                 {
                                     "from": "15551234567",

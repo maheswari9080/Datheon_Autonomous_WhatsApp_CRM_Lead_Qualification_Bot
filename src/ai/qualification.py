@@ -1,9 +1,7 @@
 """Deterministic B2B Lead Qualification Policy Engine."""
 
-from typing import Any
 from src.ai.schemas import (
     DecisionMakerEnum,
-    ExtractedLeadData,
     LeadExtractionResult,
     ProblemUrgencyEnum,
     QualificationStatusEnum,
@@ -17,7 +15,7 @@ settings = get_settings()
 
 class QualificationPolicyEngine:
     """Evaluates extracted lead data against configurable B2B qualification rules.
-    
+
     Guarantees deterministic decision-making:
     - LLM provides extracted signals and suggestions.
     - Python backend enforces strict policy thresholds before authorizing booking or CRM sync.
@@ -29,13 +27,21 @@ class QualificationPolicyEngine:
         min_confidence: float | None = None,
         require_decision_maker: bool = True,
     ):
-        self.min_budget = min_budget if min_budget is not None else settings.MIN_QUALIFICATION_BUDGET
-        self.min_confidence = min_confidence if min_confidence is not None else settings.QUALIFICATION_CONFIDENCE_THRESHOLD
+        self.min_budget = (
+            min_budget if min_budget is not None else settings.MIN_QUALIFICATION_BUDGET
+        )
+        self.min_confidence = (
+            min_confidence
+            if min_confidence is not None
+            else settings.QUALIFICATION_CONFIDENCE_THRESHOLD
+        )
         self.require_decision_maker = require_decision_maker
 
-    def evaluate_qualification(self, extraction: LeadExtractionResult) -> tuple[QualificationStatusEnum, str, float]:
+    def evaluate_qualification(
+        self, extraction: LeadExtractionResult
+    ) -> tuple[QualificationStatusEnum, str, float]:
         """Evaluate extracted lead data against deterministic business criteria.
-        
+
         Returns:
             Tuple of (QualificationStatusEnum, reasoning_summary, score)
         """
@@ -77,7 +83,11 @@ class QualificationPolicyEngine:
         # 5. Check Confidence Threshold
         if extraction.confidence_score < self.min_confidence:
             reason = f"Extraction confidence score ({extraction.confidence_score:.2f}) below threshold ({self.min_confidence:.2f})."
-            return QualificationStatusEnum.NEEDS_MORE_INFORMATION, reason, extraction.confidence_score
+            return (
+                QualificationStatusEnum.NEEDS_MORE_INFORMATION,
+                reason,
+                extraction.confidence_score,
+            )
 
         # 6. Fully Qualified Lead
         score = 0.85

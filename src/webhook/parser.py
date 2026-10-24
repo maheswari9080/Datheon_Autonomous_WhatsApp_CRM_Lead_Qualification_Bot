@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from typing import Any
+
 from src.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -35,9 +36,11 @@ class WhatsAppPayloadParser:
     """Extracts typed messages and status events from raw Meta webhook JSON."""
 
     @classmethod
-    def parse_payload(cls, payload: dict[str, Any]) -> tuple[list[ParsedWhatsAppMessage], list[ParsedWhatsAppStatus]]:
+    def parse_payload(
+        cls, payload: dict[str, Any]
+    ) -> tuple[list[ParsedWhatsAppMessage], list[ParsedWhatsAppStatus]]:
         """Parse raw webhook JSON into structured messages and delivery statuses.
-        
+
         Guarantees that delivery/read receipts are completely separated from
         inbound customer messages so status callbacks NEVER accidentally create leads.
         """

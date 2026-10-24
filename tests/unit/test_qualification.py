@@ -1,6 +1,7 @@
 """Unit tests for AI lead extraction schemas and deterministic qualification rules."""
 
 import pytest
+
 from src.ai.client import MockRuleBasedLLMClient
 from src.ai.qualification import QualificationPolicyEngine
 from src.ai.schemas import (

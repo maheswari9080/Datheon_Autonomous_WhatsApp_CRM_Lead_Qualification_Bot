@@ -5,7 +5,7 @@ import logging
 import re
 import sys
 from contextvars import ContextVar
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 # Context variable for request correlation IDs across async tasks
@@ -14,7 +14,9 @@ correlation_id_ctx: ContextVar[str] = ContextVar("correlation_id", default="syst
 # PII regex patterns for automated redaction
 PHONE_REGEX = re.compile(r"(\+?\d{1,3})[-.\s]?(\d{3})[-.\s]?\d{3}[-.\s]?(\d{2,4})")
 BEARER_REGEX = re.compile(r"(Bearer\s+)[A-Za-z0-9_\-\.]{8,}", re.IGNORECASE)
-SECRET_REGEX = re.compile(r"(secret|token|key|password)\s*[:=]\s*['\"]?([A-Za-z0-9_\-\.]{6,})['\"]?", re.IGNORECASE)
+SECRET_REGEX = re.compile(
+    r"(secret|token|key|password)\s*[:=]\s*['\"]?([A-Za-z0-9_\-\.]{6,})['\"]?", re.IGNORECASE
+)
 
 
 def mask_pii(text: str) -> str:
@@ -35,7 +37,7 @@ class StructuredJsonFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         log_payload: dict[str, Any] = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "level": record.levelname,
             "logger": record.name,
             "message": mask_pii(record.getMessage()),

@@ -1,24 +1,25 @@
 """Pydantic V2 schemas for AI lead extraction and qualification validation."""
 
-from enum import Enum
 import re
+from enum import StrEnum
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
-class ProblemUrgencyEnum(str, Enum):
+class ProblemUrgencyEnum(StrEnum):
     LOW = "LOW"
     MEDIUM = "MEDIUM"
     HIGH = "HIGH"
     CRITICAL = "CRITICAL"
 
 
-class DecisionMakerEnum(str, Enum):
+class DecisionMakerEnum(StrEnum):
     YES = "YES"
     NO = "NO"
     UNKNOWN = "UNKNOWN"
 
 
-class QualificationStatusEnum(str, Enum):
+class QualificationStatusEnum(StrEnum):
     QUALIFIED = "QUALIFIED"
     NOT_QUALIFIED = "NOT_QUALIFIED"
     NEEDS_MORE_INFORMATION = "NEEDS_MORE_INFORMATION"
@@ -31,14 +32,24 @@ class ExtractedLeadData(BaseModel):
     model_config = ConfigDict(from_attributes=True, extra="ignore")
 
     contact_name: str | None = Field(default=None, description="Prospect full or first name")
-    company_name: str | None = Field(default=None, description="Prospect business or organization name")
-    budget_amount: float | None = Field(default=None, description="Normalized numeric budget in standard currency")
+    company_name: str | None = Field(
+        default=None, description="Prospect business or organization name"
+    )
+    budget_amount: float | None = Field(
+        default=None, description="Normalized numeric budget in standard currency"
+    )
     budget_currency: str = Field(default="USD", description="3-letter ISO currency code")
-    company_size: str | None = Field(default=None, description="Employee count or range (e.g., '10-50')")
-    business_problem: str | None = Field(default=None, description="Core pain point, workflow bottleneck, or goal")
+    company_size: str | None = Field(
+        default=None, description="Employee count or range (e.g., '10-50')"
+    )
+    business_problem: str | None = Field(
+        default=None, description="Core pain point, workflow bottleneck, or goal"
+    )
     urgency: ProblemUrgencyEnum = Field(default=ProblemUrgencyEnum.MEDIUM)
     decision_maker: DecisionMakerEnum = Field(default=DecisionMakerEnum.UNKNOWN)
-    purchase_timeline: str | None = Field(default=None, description="Target timeline (e.g., 'Immediate', '3 months')")
+    purchase_timeline: str | None = Field(
+        default=None, description="Target timeline (e.g., 'Immediate', '3 months')"
+    )
 
     @field_validator("budget_currency")
     @classmethod
@@ -81,16 +92,27 @@ class LeadExtractionResult(BaseModel):
     model_config = ConfigDict(from_attributes=True, extra="ignore")
 
     lead: ExtractedLeadData = Field(default_factory=ExtractedLeadData)
-    qualification_status: QualificationStatusEnum = Field(default=QualificationStatusEnum.NEEDS_MORE_INFORMATION)
-    confidence_score: float = Field(ge=0.0, le=1.0, default=0.5, description="Model confidence in extracted attributes")
-    missing_information: list[str] = Field(default_factory=list, description="Mandatory business fields still missing")
+    qualification_status: QualificationStatusEnum = Field(
+        default=QualificationStatusEnum.NEEDS_MORE_INFORMATION
+    )
+    confidence_score: float = Field(
+        ge=0.0, le=1.0, default=0.5, description="Model confidence in extracted attributes"
+    )
+    missing_information: list[str] = Field(
+        default_factory=list, description="Mandatory business fields still missing"
+    )
     next_recommended_question: str | None = Field(
         default=None,
         description="Single concise follow-up question to present to the user",
     )
-    is_adversarial: bool = Field(default=False, description="Flagged if prompt injection or override attempt detected")
+    is_adversarial: bool = Field(
+        default=False, description="Flagged if prompt injection or override attempt detected"
+    )
     customer_sentiment_score: float = Field(
-        ge=-1.0, le=1.0, default=0.0, description="Sentiment polarity (-1.0 = furious, +1.0 = delighted)"
+        ge=-1.0,
+        le=1.0,
+        default=0.0,
+        description="Sentiment polarity (-1.0 = furious, +1.0 = delighted)",
     )
 
     @model_validator(mode="after")

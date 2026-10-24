@@ -1,8 +1,9 @@
 """Webhook event dispatcher and stateful conversation orchestrator."""
 
-from datetime import date, datetime, timezone
 import re
+from datetime import date, datetime
 from typing import Any
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -44,7 +45,10 @@ async def get_or_create_lead(
         )
         db.add(lead)
         await db.flush()
-        logger.info(f"Created new lead for phone {phone_number}", extra={"extra_fields": {"lead_id": lead.id}})
+        logger.info(
+            f"Created new lead for phone {phone_number}",
+            extra={"extra_fields": {"lead_id": lead.id}},
+        )
     elif contact_name and not lead.contact_name:
         lead.contact_name = contact_name
         await db.flush()
@@ -98,7 +102,9 @@ async def execute_conversation_turn(
         return
 
     # 2. STRIDE & Input Guardrails
-    cleaned_text, is_malicious, violation_reason = InputGuardrails.inspect_and_sanitize(inbound_text)
+    cleaned_text, is_malicious, violation_reason = InputGuardrails.inspect_and_sanitize(
+        inbound_text
+    )
     if is_malicious:
         await EscalationController.trigger_handoff(
             db=db,
@@ -132,7 +138,10 @@ async def execute_conversation_turn(
         .limit(10)
     )
     history_records = (await db.execute(msg_stmt)).scalars().all()
-    dialogue_history = [{"role": "user" if m.direction == "INBOUND" else "assistant", "content": m.content} for m in history_records]
+    dialogue_history = [
+        {"role": "user" if m.direction == "INBOUND" else "assistant", "content": m.content}
+        for m in history_records
+    ]
     dialogue_history.append({"role": "user", "content": cleaned_text})
 
     # 4. AI Intelligence Extraction
@@ -202,12 +211,16 @@ async def execute_conversation_turn(
             "platform requires a higher minimum budget scope. We appreciate your time and wish you the best!"
         )
         await TransactionalOutboxWorker.enqueue_event(
-            db, "WHATSAPP_DISPATCH", {"recipient_phone": lead.phone_number, "message_body": disqual_msg}
+            db,
+            "WHATSAPP_DISPATCH",
+            {"recipient_phone": lead.phone_number, "message_body": disqual_msg},
         )
 
     elif qual_status == QualificationStatusEnum.NEEDS_MORE_INFORMATION:
         # FSM -> NEEDS_INFORMATION
-        if ConversationFSM.is_legal_transition(conversation.current_state, ConversationState.NEEDS_INFORMATION):
+        if ConversationFSM.is_legal_transition(
+            conversation.current_state, ConversationState.NEEDS_INFORMATION
+        ):
             new_state, updated_meta = ConversationFSM.transition(
                 conversation.current_state,
                 ConversationState.NEEDS_INFORMATION,
@@ -218,15 +231,26 @@ async def execute_conversation_turn(
             conversation.current_state = new_state.value
             conversation.state_metadata = updated_meta
 
-        followup = extraction.next_recommended_question or "Could you share a bit more about your budget and timeline?"
+        followup = (
+            extraction.next_recommended_question
+            or "Could you share a bit more about your budget and timeline?"
+        )
         await TransactionalOutboxWorker.enqueue_event(
-            db, "WHATSAPP_DISPATCH", {"recipient_phone": lead.phone_number, "message_body": followup}
+            db,
+            "WHATSAPP_DISPATCH",
+            {"recipient_phone": lead.phone_number, "message_body": followup},
         )
 
     elif qual_status == QualificationStatusEnum.QUALIFIED:
         # Check if customer is confirming a slot or requesting slots
         offered_slots = conversation.state_metadata.get("offered_slots", [])
-        is_slot_selection = bool(re.search(r"\b(slot|option|confirm|book|yes|1|2|3|tomorrow|tuesday|monday)\b", cleaned_text, re.IGNORECASE))
+        is_slot_selection = bool(
+            re.search(
+                r"\b(slot|option|confirm|book|yes|1|2|3|tomorrow|tuesday|monday)\b",
+                cleaned_text,
+                re.IGNORECASE,
+            )
+        )
 
         if offered_slots and is_slot_selection:
             # Slot confirmed! FSM: QUALIFIED/BOOKING -> BOOKED
@@ -261,13 +285,20 @@ async def execute_conversation_turn(
             db.add(booking_record)
 
             # FSM transition to BOOKED
-            if ConversationFSM.is_legal_transition(conversation.current_state, ConversationState.BOOKING):
+            if ConversationFSM.is_legal_transition(
+                conversation.current_state, ConversationState.BOOKING
+            ):
                 new_state, updated_meta = ConversationFSM.transition(
-                    conversation.current_state, ConversationState.BOOKING, conversation.state_metadata
+                    conversation.current_state,
+                    ConversationState.BOOKING,
+                    conversation.state_metadata,
                 )
                 conversation.current_state = new_state.value
             new_state, updated_meta = ConversationFSM.transition(
-                conversation.current_state, ConversationState.BOOKED, conversation.state_metadata, reason="Booking confirmed"
+                conversation.current_state,
+                ConversationState.BOOKED,
+                conversation.state_metadata,
+                reason="Booking confirmed",
             )
             conversation.previous_state = conversation.current_state
             conversation.current_state = new_state.value
@@ -293,12 +324,16 @@ async def execute_conversation_turn(
                 f"We look forward to speaking with you!"
             )
             await TransactionalOutboxWorker.enqueue_event(
-                db, "WHATSAPP_DISPATCH", {"recipient_phone": lead.phone_number, "message_body": confirm_msg}
+                db,
+                "WHATSAPP_DISPATCH",
+                {"recipient_phone": lead.phone_number, "message_body": confirm_msg},
             )
 
         else:
             # Transition to QUALIFIED and offer slots
-            if ConversationFSM.is_legal_transition(conversation.current_state, ConversationState.QUALIFIED):
+            if ConversationFSM.is_legal_transition(
+                conversation.current_state, ConversationState.QUALIFIED
+            ):
                 new_state, updated_meta = ConversationFSM.transition(
                     conversation.current_state,
                     ConversationState.QUALIFIED,
@@ -310,7 +345,9 @@ async def execute_conversation_turn(
                 conversation.state_metadata = updated_meta
 
             # Fetch available calendar slots
-            slots = await scheduler.get_interactive_slots(start_date=date.today(), limit=3, user_phone=lead.phone_number)
+            slots = await scheduler.get_interactive_slots(
+                start_date=date.today(), limit=3, user_phone=lead.phone_number
+            )
             if slots:
                 # Lock first slot provisionally
                 scheduler.reserve_slot_lock(slots[0], user_phone=lead.phone_number)
@@ -331,7 +368,9 @@ async def execute_conversation_turn(
                     f"Reply with 'Confirm' to lock in the first slot or let us know your preferred time!"
                 )
                 await TransactionalOutboxWorker.enqueue_event(
-                    db, "WHATSAPP_DISPATCH", {"recipient_phone": lead.phone_number, "message_body": invitation_msg}
+                    db,
+                    "WHATSAPP_DISPATCH",
+                    {"recipient_phone": lead.phone_number, "message_body": invitation_msg},
                 )
 
 
@@ -352,7 +391,11 @@ async def process_inbound_webhook(payload: dict[str, Any], correlation_id: str) 
                 event_type="MESSAGE_STATUS_RECEIPT",
                 actor="SYSTEM",
                 resource_id=st.message_id,
-                details={"recipient": st.recipient_phone, "status": st.status, "error": st.error_details},
+                details={
+                    "recipient": st.recipient_phone,
+                    "status": st.status,
+                    "error": st.error_details,
+                },
             )
             db.add(audit)
 

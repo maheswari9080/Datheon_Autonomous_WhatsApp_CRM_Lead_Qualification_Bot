@@ -33,7 +33,7 @@ class CRMAdapterProtocol(Protocol):
 
     async def sync_lead(self, payload: CRMLeadPayload) -> dict[str, Any]:
         """Idempotently create or update a lead in external CRM.
-        
+
         Returns:
             Dictionary containing {"external_record_id": str, "status": "SYNCED"}
         """

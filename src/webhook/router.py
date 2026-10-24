@@ -2,6 +2,7 @@
 
 import json
 import uuid
+
 from fastapi import APIRouter, BackgroundTasks, Header, HTTPException, Query, Request, status
 from fastapi.responses import PlainTextResponse
 
@@ -23,7 +24,7 @@ async def verify_webhook(
     hub_challenge: str | None = Query(None, alias="hub.challenge"),
 ) -> PlainTextResponse:
     """Meta WhatsApp Webhook GET Verification Challenge.
-    
+
     Meta sends hub.mode='subscribe', hub.verify_token, and hub.challenge.
     If hub.verify_token matches configured META_VERIFY_TOKEN, return hub.challenge as plain text.
     """
@@ -51,7 +52,7 @@ async def ingest_webhook(
     x_hub_signature_256: str | None = Header(None, alias="X-Hub-Signature-256"),
 ) -> dict[str, str]:
     """Meta WhatsApp Webhook POST Ingestion Endpoint.
-    
+
     1. Validates HMAC-SHA256 signature against raw request body bytes.
     2. Generates a correlation ID for end-to-end event tracing.
     3. Quickly returns 200 OK within 200ms to fulfill Meta SLA.
@@ -99,6 +100,7 @@ async def ingest_webhook(
     )
 
     from src.webhook.dispatcher import process_inbound_webhook
+
     background_tasks.add_task(process_inbound_webhook, payload, correlation_id)
 
     return {"status": "received", "correlation_id": correlation_id}

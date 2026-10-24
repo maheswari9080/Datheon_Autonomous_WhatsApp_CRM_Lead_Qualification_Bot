@@ -1,6 +1,7 @@
 """Team notification dispatcher (Slack / Webhook alerts)."""
 
 from typing import Any
+
 import httpx
 
 from src.core.config import get_settings
@@ -37,22 +38,40 @@ class EscalationNotifier:
             "blocks": [
                 {
                     "type": "header",
-                    "text": {"type": "plain_text", "text": "🚨 WhatsApp Customer Escalation", "emoji": True},
+                    "text": {
+                        "type": "plain_text",
+                        "text": "🚨 WhatsApp Customer Escalation",
+                        "emoji": True,
+                    },
                 },
                 {
                     "type": "section",
                     "fields": [
                         {"type": "mrkdwn", "text": f"*Phone:*\n{phone_number}"},
                         {"type": "mrkdwn", "text": f"*Trigger Reason:*\n{reason}"},
-                        {"type": "mrkdwn", "text": f"*Lead Name:*\n{dossier.get('contact_name') or 'Unknown'}"},
-                        {"type": "mrkdwn", "text": f"*Company:*\n{dossier.get('company_name') or 'Unknown'}"},
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Lead Name:*\n{dossier.get('contact_name') or 'Unknown'}",
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Company:*\n{dossier.get('company_name') or 'Unknown'}",
+                        },
                         {"type": "mrkdwn", "text": f"*Budget:*\n${budget_val:,.2f}"},
-                        {"type": "mrkdwn", "text": f"*Qualification Status:*\n{dossier.get('qualification_status') or 'NEW'}"},
+                        {
+                            "type": "mrkdwn",
+                            "text": f"*Qualification Status:*\n{dossier.get('qualification_status') or 'NEW'}",
+                        },
                     ],
                 },
                 {
                     "type": "context",
-                    "elements": [{"type": "mrkdwn", "text": f"Incident ID: `{incident_id}` | Automation paused"}],
+                    "elements": [
+                        {
+                            "type": "mrkdwn",
+                            "text": f"Incident ID: `{incident_id}` | Automation paused",
+                        }
+                    ],
                 },
             ],
         }
@@ -64,12 +83,16 @@ class EscalationNotifier:
                 async with httpx.AsyncClient(timeout=5.0) as client:
                     resp = await client.post(self.webhook_url, json=message_blocks)
                     if resp.status_code == 200:
-                        logger.info(f"Slack escalation alert dispatched successfully for {incident_id}")
+                        logger.info(
+                            f"Slack escalation alert dispatched successfully for {incident_id}"
+                        )
                         return True
             except Exception as exc:
                 logger.error(f"Failed posting Slack escalation alert: {exc}")
 
-        logger.info(f"[Escalation Notifier Simulation] Slack card generated for {phone_number}: {reason}")
+        logger.info(
+            f"[Escalation Notifier Simulation] Slack card generated for {phone_number}: {reason}"
+        )
         return True
 
 

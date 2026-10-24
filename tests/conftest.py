@@ -1,14 +1,14 @@
 """Pytest fixtures and configuration."""
 
 from collections.abc import AsyncGenerator
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.config import Settings, get_settings
-from src.database.base import Base
-from src.database.session import async_session_factory, engine, init_db
+from src.core.config import Settings
+from src.database.session import async_session_factory, init_db
 from src.main import app
 from src.webhook.deduplicator import deduplicator
 
@@ -36,7 +36,15 @@ async def clean_database():
     deduplicator._cache.clear()
     async with async_session_factory() as session:
         # Clear tables in order of foreign key dependency
-        for tbl in ["messages", "bookings", "handoff_escalations", "outbox_events", "audit_events", "conversations", "leads"]:
+        for tbl in [
+            "messages",
+            "bookings",
+            "handoff_escalations",
+            "outbox_events",
+            "audit_events",
+            "conversations",
+            "leads",
+        ]:
             await session.execute(text(f"DELETE FROM {tbl}"))
         await session.commit()
     yield

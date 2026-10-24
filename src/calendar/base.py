@@ -36,7 +36,7 @@ class CalendarAdapterProtocol(Protocol):
         summary: str,
     ) -> dict[str, Any]:
         """Book a confirmed calendar demonstration event.
-        
+
         Returns:
             Dictionary containing event_id, meeting_url, and status.
         """

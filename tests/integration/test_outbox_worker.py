@@ -1,8 +1,8 @@
 """Integration tests for Transactional Outbox pattern worker."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 import pytest
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.crm.outbox import TransactionalOutboxWorker
@@ -62,7 +62,7 @@ async def test_outbox_retry_exponential_backoff_and_dead_letter(db_session: Asyn
         status="PENDING",
         retry_count=0,
         max_retries=2,
-        next_retry_at=datetime.now(timezone.utc),
+        next_retry_at=datetime.now(UTC),
     )
     db_session.add(event)
     await db_session.commit()

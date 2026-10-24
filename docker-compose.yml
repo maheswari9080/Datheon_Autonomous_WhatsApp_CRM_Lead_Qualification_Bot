@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: datheon_whatsapp_bot
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=production
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres_secure_pass@db:5432/datheon_sales
+      - META_VERIFY_TOKEN=${META_VERIFY_TOKEN:-datheon_verify_token_default}
+      - META_APP_SECRET=${META_APP_SECRET:-meta_app_secret_placeholder}
+      - META_PHONE_NUMBER_ID=${META_PHONE_NUMBER_ID:-100000000000001}
+      - META_ACCESS_TOKEN=${META_ACCESS_TOKEN:-meta_access_token_placeholder}
+      - ADMIN_API_KEY=${ADMIN_API_KEY:-datheon_admin_secret_token_1234}
+      - LLM_PROVIDER=${LLM_PROVIDER:-mock}
+      - CALENDAR_PROVIDER=${CALENDAR_PROVIDER:-mock}
+      - CRM_PROVIDER=${CRM_PROVIDER:-mock}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    container_name: datheon_postgres_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres_secure_pass
+      - POSTGRES_DB=datheon_sales
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d datheon_sales"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

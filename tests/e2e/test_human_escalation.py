@@ -5,7 +5,7 @@ from httpx import AsyncClient
 from sqlalchemy import select
 
 from src.core.config import get_settings
-from src.database.models import Conversation, HandoffEscalation, Lead, OutboxEvent
+from src.database.models import Conversation, HandoffEscalation, Lead
 from src.database.session import async_session_factory
 from src.fsm.states import ConversationState
 from src.webhook.dispatcher import process_inbound_webhook

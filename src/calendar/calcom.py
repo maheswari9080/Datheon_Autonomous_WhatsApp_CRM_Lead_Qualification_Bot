@@ -1,9 +1,8 @@
 """Cal.com API integration adapter."""
 
-from datetime import date, datetime, time, timedelta, timezone
 import uuid
+from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
-import httpx
 
 from src.calendar.base import CalendarAdapterProtocol, TimeSlot
 from src.core.exceptions import CalendarSlotUnavailableError
@@ -41,7 +40,7 @@ class CalComCalendarAdapter(CalendarAdapterProtocol):
         timezone_str: str = "UTC",
     ) -> list[TimeSlot]:
         """Fetch available Cal.com slots applying business hours and notice filters."""
-        now_utc = datetime.now(timezone.utc)
+        now_utc = datetime.now(UTC)
         earliest_time = now_utc + timedelta(hours=self.min_notice_hours)
         slots: list[TimeSlot] = []
 
@@ -51,10 +50,10 @@ class CalComCalendarAdapter(CalendarAdapterProtocol):
                 continue
 
             current_slot_start = datetime.combine(
-                target_date, time(hour=self.business_start, minute=0), tzinfo=timezone.utc
+                target_date, time(hour=self.business_start, minute=0), tzinfo=UTC
             )
             day_end = datetime.combine(
-                target_date, time(hour=self.business_end, minute=0), tzinfo=timezone.utc
+                target_date, time(hour=self.business_end, minute=0), tzinfo=UTC
             )
 
             while current_slot_start + timedelta(minutes=self.slot_duration) <= day_end:
@@ -63,8 +62,16 @@ class CalComCalendarAdapter(CalendarAdapterProtocol):
                     slot_id = f"calcom_{current_slot_start.strftime('%Y%m%d_%H%M')}"
                     is_colliding = False
                     for ev in self._booked_events.values():
-                        ev_start = datetime.fromisoformat(ev["start_time"]) if isinstance(ev["start_time"], str) else ev["start_time"]
-                        ev_end = datetime.fromisoformat(ev["end_time"]) if isinstance(ev["end_time"], str) else ev["end_time"]
+                        ev_start = (
+                            datetime.fromisoformat(ev["start_time"])
+                            if isinstance(ev["start_time"], str)
+                            else ev["start_time"]
+                        )
+                        ev_end = (
+                            datetime.fromisoformat(ev["end_time"])
+                            if isinstance(ev["end_time"], str)
+                            else ev["end_time"]
+                        )
                         if ev_start < slot_end and ev_end > current_slot_start:
                             is_colliding = True
                             break
@@ -93,8 +100,16 @@ class CalComCalendarAdapter(CalendarAdapterProtocol):
     ) -> dict[str, Any]:
         """Create confirmed Cal.com booking."""
         for ev in self._booked_events.values():
-            ev_start = datetime.fromisoformat(ev["start_time"]) if isinstance(ev["start_time"], str) else ev["start_time"]
-            ev_end = datetime.fromisoformat(ev["end_time"]) if isinstance(ev["end_time"], str) else ev["end_time"]
+            ev_start = (
+                datetime.fromisoformat(ev["start_time"])
+                if isinstance(ev["start_time"], str)
+                else ev["start_time"]
+            )
+            ev_end = (
+                datetime.fromisoformat(ev["end_time"])
+                if isinstance(ev["end_time"], str)
+                else ev["end_time"]
+            )
             if ev_start < end_time and ev_end > start_time:
                 raise CalendarSlotUnavailableError("Slot unavailable on Cal.com")
 
@@ -104,12 +119,14 @@ class CalComCalendarAdapter(CalendarAdapterProtocol):
             "provider": "calcom",
             "lead_name": lead_name,
             "lead_phone": lead_phone,
-            "start_time": start_time.isoformat() if isinstance(start_time, datetime) else str(start_time),
+            "start_time": start_time.isoformat()
+            if isinstance(start_time, datetime)
+            else str(start_time),
             "end_time": end_time.isoformat() if isinstance(end_time, datetime) else str(end_time),
             "summary": summary,
             "meeting_url": f"https://cal.com/booking/{event_id}",
             "status": "CONFIRMED",
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
         }
         self._booked_events[event_id] = booking_data
         logger.info(f"Cal.com booking created: {event_id}")

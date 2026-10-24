@@ -1,9 +1,9 @@
 """Conversation state definitions and event triggers."""
 
-from enum import Enum
+from enum import StrEnum
 
 
-class ConversationState(str, Enum):
+class ConversationState(StrEnum):
     """Formal states for the autonomous sales qualification and booking lifecycle."""
 
     NEW = "NEW"
@@ -20,7 +20,7 @@ class ConversationState(str, Enum):
     PROCESSING_ERROR = "PROCESSING_ERROR"
 
 
-class ConversationEvent(str, Enum):
+class ConversationEvent(StrEnum):
     """Events driving transitions within the ConversationFSM."""
 
     INBOUND_MESSAGE = "INBOUND_MESSAGE"

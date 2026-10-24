@@ -1,7 +1,7 @@
 """Human Handoff and Escalation Controller."""
 
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,7 +28,7 @@ class EscalationController:
         is_adversarial: bool = False,
     ) -> tuple[bool, str, str]:
         """Check all triggers for escalation.
-        
+
         Returns:
             Tuple of (should_escalate, trigger_type, reason)
         """
@@ -42,7 +42,11 @@ class EscalationController:
             return True, "NEGATIVE_SENTIMENT", "Customer expressing high frustration or annoyance"
 
         if consecutive_failures >= 3:
-            return True, "REPEATED_FAILURE", "Assistant repeatedly failed to extract required information"
+            return (
+                True,
+                "REPEATED_FAILURE",
+                "Assistant repeatedly failed to extract required information",
+            )
 
         return False, "NONE", ""
 
@@ -77,7 +81,7 @@ class EscalationController:
             "urgency": lead.urgency,
             "phone_number": lead.phone_number,
             "dialogue_history": recent_dialogue or [],
-            "escalated_at": datetime.now(timezone.utc).isoformat(),
+            "escalated_at": datetime.now(UTC).isoformat(),
         }
 
         # 3. Create persistent HandoffEscalation record
@@ -135,7 +139,7 @@ class EscalationController:
         escalation.status = "RESOLVED"
         escalation.assigned_agent = assigned_agent
         escalation.resolution_notes = resolution_notes
-        escalation.resolved_at = datetime.now(timezone.utc)
+        escalation.resolved_at = datetime.now(UTC)
 
         # Check if we should resume bot automation
         if resume_automation:

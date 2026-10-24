@@ -1,12 +1,12 @@
 """Airtable CRM integration adapter."""
 
-from datetime import datetime, timezone
 import uuid
+from datetime import UTC, datetime
 from typing import Any
+
 import httpx
 
 from src.core.config import get_settings
-from src.core.exceptions import CRMSynchronizationError
 from src.core.logging import get_logger
 from src.crm.base import CRMAdapterProtocol, CRMLeadPayload
 
@@ -32,7 +32,12 @@ class AirtableCRMAdapter(CRMAdapterProtocol):
     async def sync_lead(self, payload: CRMLeadPayload) -> dict[str, Any]:
         """Synchronize or update lead in Airtable table."""
         # Check if production credentials are provided
-        if self.api_key and not self.api_key.startswith("pat_placeholder") and self.base_id and not self.base_id.startswith("app_placeholder"):
+        if (
+            self.api_key
+            and not self.api_key.startswith("pat_placeholder")
+            and self.base_id
+            and not self.base_id.startswith("app_placeholder")
+        ):
             try:
                 url = f"https://api.airtable.com/v0/{self.base_id}/{self.table_name}"
                 headers = {
@@ -79,13 +84,15 @@ class AirtableCRMAdapter(CRMAdapterProtocol):
             "calendar_event_id": payload.calendar_event_id,
             "meeting_url": payload.meeting_url,
             "is_escalated": payload.is_escalated,
-            "synced_at": datetime.now(timezone.utc).isoformat(),
+            "synced_at": datetime.now(UTC).isoformat(),
             "status": "SYNCED",
         }
         self._records[payload.phone_number] = record_data
         logger.info(
             f"CRM Synced for {payload.phone_number} -> {record_id} ({payload.qualification_status})",
-            extra={"extra_fields": {"record_id": record_id, "status": payload.qualification_status}},
+            extra={
+                "extra_fields": {"record_id": record_id, "status": payload.qualification_status}
+            },
         )
         return {"external_record_id": record_id, "status": "SYNCED"}
 

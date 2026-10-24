@@ -1,6 +1,7 @@
 """Unit tests for CRM adapter and payload synchronization."""
 
 import pytest
+
 from src.crm.airtable import AirtableCRMAdapter
 from src.crm.base import CRMLeadPayload
 

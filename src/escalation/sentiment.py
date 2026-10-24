@@ -3,15 +3,24 @@
 import re
 
 HUMAN_REQUEST_PATTERNS = [
-    re.compile(r"\b(talk\s+to\s+(a\s+)?(human|agent|person|representative|operator|manager))\b", re.IGNORECASE),
+    re.compile(
+        r"\b(talk\s+to\s+(a\s+)?(human|agent|person|representative|operator|manager))\b",
+        re.IGNORECASE,
+    ),
     re.compile(r"\b(speak\s+with\s+(a\s+)?(human|agent|person|representative))\b", re.IGNORECASE),
     re.compile(r"\b(i\s+want\s+(a\s+)?human)\b", re.IGNORECASE),
     re.compile(r"\b(connect\s+me\s+to\s+(an?\s+)?(agent|human|representative))\b", re.IGNORECASE),
-    re.compile(r"\b((reach|contact|get|transfer to|connect( me)? to|i need)\s+(customer|human)\s+support)\b", re.IGNORECASE),
+    re.compile(
+        r"\b((reach|contact|get|transfer to|connect( me)? to|i need)\s+(customer|human)\s+support)\b",
+        re.IGNORECASE,
+    ),
 ]
 
 FRUSTRATION_PATTERNS = [
-    re.compile(r"\b(stupid\s+bot|useless\s+bot|idiot|annoying|scam|hate\s+this|terrible\s+service)\b", re.IGNORECASE),
+    re.compile(
+        r"\b(stupid\s+bot|useless\s+bot|idiot|annoying|scam|hate\s+this|terrible\s+service)\b",
+        re.IGNORECASE,
+    ),
     re.compile(r"\b(stop\s+asking\s+me|already\s+told\s+you|waste\s+of\s+time)\b", re.IGNORECASE),
 ]
 

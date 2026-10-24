@@ -1,12 +1,14 @@
 """FastAPI application entry point."""
 
+import uuid
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-import uuid
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from src.api.admin import admin_router
 from src.core.config import get_settings
 from src.core.logging import correlation_id_ctx, get_logger, setup_logging
 from src.database.session import close_db, init_db
@@ -59,7 +61,6 @@ app.add_middleware(
 
 # Include Routers
 app.include_router(webhook_router)
-from src.api.admin import admin_router
 app.include_router(admin_router)
 
 

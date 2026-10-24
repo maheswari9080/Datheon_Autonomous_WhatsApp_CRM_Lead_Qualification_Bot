@@ -1,6 +1,7 @@
 """Unit tests for HMAC-SHA256 signature verification and security utilities."""
 
 import pytest
+
 from src.core.exceptions import InvalidWebhookSignatureError
 from src.core.logging import mask_pii
 from src.core.security import compute_whatsapp_signature, verify_whatsapp_signature

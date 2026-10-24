@@ -1,6 +1,7 @@
 """Deterministic Conversation Finite State Machine (FSM)."""
 
 from typing import Any
+
 from src.core.exceptions import InvalidStateTransitionError
 from src.core.logging import get_logger
 from src.fsm.states import ConversationState
@@ -73,7 +74,7 @@ LEGAL_TRANSITIONS: dict[ConversationState, set[ConversationState]] = {
     },
     ConversationState.HUMAN_HANDOFF: {
         ConversationState.DISCOVERY,  # Operator manually resumes automation
-        ConversationState.CLOSED,     # Operator completes ticket
+        ConversationState.CLOSED,  # Operator completes ticket
         ConversationState.PROCESSING_ERROR,
     },
     ConversationState.PROCESSING_ERROR: {
@@ -88,7 +89,9 @@ class ConversationFSM:
     """Manages legal transitions, guards, and metadata updates for conversations."""
 
     @staticmethod
-    def is_legal_transition(source: ConversationState | str, target: ConversationState | str) -> bool:
+    def is_legal_transition(
+        source: ConversationState | str, target: ConversationState | str
+    ) -> bool:
         """Check whether a transition is permitted by the state table."""
         src_enum = ConversationState(source)
         tgt_enum = ConversationState(target)
@@ -105,10 +108,10 @@ class ConversationFSM:
         reason: str = "",
     ) -> tuple[ConversationState, dict[str, Any]]:
         """Validate and execute a state transition.
-        
+
         Returns:
             Tuple of (new_state, updated_metadata)
-            
+
         Raises:
             InvalidStateTransitionError: If the transition violates FSM invariants.
         """
@@ -128,14 +131,18 @@ class ConversationFSM:
 
         # Record transition history inside metadata
         history = metadata.setdefault("state_history", [])
-        history.append({
-            "from": src.value,
-            "to": tgt.value,
-            "reason": reason,
-        })
+        history.append(
+            {
+                "from": src.value,
+                "to": tgt.value,
+                "reason": reason,
+            }
+        )
 
         logger.info(
             f"FSM Transition: {src.value} -> {tgt.value}",
-            extra={"extra_fields": {"from_state": src.value, "to_state": tgt.value, "reason": reason}},
+            extra={
+                "extra_fields": {"from_state": src.value, "to_state": tgt.value, "reason": reason}
+            },
         )
         return tgt, metadata

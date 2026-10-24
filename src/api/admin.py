@@ -1,6 +1,7 @@
 """Admin management API for operations, human takeover, and observability."""
 
 from typing import Any
+
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from pydantic import BaseModel
 from sqlalchemy import func, select
@@ -8,7 +9,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import get_settings
 from src.crm.outbox import TransactionalOutboxWorker
-from src.database.models import BookingRecord, Conversation, HandoffEscalation, Lead, Message, OutboxEvent
+from src.database.models import (
+    BookingRecord,
+    Conversation,
+    HandoffEscalation,
+    Lead,
+    Message,
+    OutboxEvent,
+)
 from src.database.session import get_db
 from src.escalation.controller import EscalationController
 
@@ -70,7 +78,11 @@ async def get_conversation_details(
         raise HTTPException(status_code=404, detail="Conversation not found")
 
     # Fetch messages
-    msg_stmt = select(Message).where(Message.conversation_id == conversation_id).order_by(Message.created_at.asc())
+    msg_stmt = (
+        select(Message)
+        .where(Message.conversation_id == conversation_id)
+        .order_by(Message.created_at.asc())
+    )
     msg_res = await db.execute(msg_stmt)
     messages = msg_res.scalars().all()
 
@@ -113,7 +125,11 @@ async def get_conversation_details(
 @admin_router.get("/escalations", dependencies=[Depends(verify_admin_key)])
 async def list_open_escalations(db: AsyncSession = Depends(get_db)) -> list[dict[str, Any]]:
     """List active open human escalations."""
-    stmt = select(HandoffEscalation).where(HandoffEscalation.status == "OPEN").order_by(HandoffEscalation.created_at.desc())
+    stmt = (
+        select(HandoffEscalation)
+        .where(HandoffEscalation.status == "OPEN")
+        .order_by(HandoffEscalation.created_at.desc())
+    )
     res = await db.execute(stmt)
     escalations = res.scalars().all()
     return [
@@ -160,10 +176,20 @@ async def process_outbox_queue(db: AsyncSession = Depends(get_db)) -> dict[str, 
 async def get_system_metrics(db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
     """Aggregate high-level business intelligence and operational metrics."""
     total_leads = (await db.execute(select(func.count(Lead.id)))).scalar_one() or 0
-    qualified_leads = (await db.execute(select(func.count(Lead.id)).where(Lead.qualification_status == "QUALIFIED"))).scalar_one() or 0
+    qualified_leads = (
+        await db.execute(
+            select(func.count(Lead.id)).where(Lead.qualification_status == "QUALIFIED")
+        )
+    ).scalar_one() or 0
     total_bookings = (await db.execute(select(func.count(BookingRecord.id)))).scalar_one() or 0
-    open_escalations = (await db.execute(select(func.count(HandoffEscalation.id)).where(HandoffEscalation.status == "OPEN"))).scalar_one() or 0
-    pending_outbox = (await db.execute(select(func.count(OutboxEvent.id)).where(OutboxEvent.status == "PENDING"))).scalar_one() or 0
+    open_escalations = (
+        await db.execute(
+            select(func.count(HandoffEscalation.id)).where(HandoffEscalation.status == "OPEN")
+        )
+    ).scalar_one() or 0
+    pending_outbox = (
+        await db.execute(select(func.count(OutboxEvent.id)).where(OutboxEvent.status == "PENDING"))
+    ).scalar_one() or 0
 
     return {
         "total_leads": total_leads,

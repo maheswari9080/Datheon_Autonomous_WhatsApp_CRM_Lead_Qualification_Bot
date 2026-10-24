@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 from typing import Literal
+
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -68,8 +69,8 @@ class Settings(BaseSettings):
     GOOGLE_SERVICE_ACCOUNT_JSON: str = ""
     CALCOM_API_KEY: str = "calcom_api_key_placeholder"
     CALCOM_EVENT_TYPE_ID: int = 12345
-    BUSINESS_HOURS_START: int = 9   # 9:00 AM
-    BUSINESS_HOURS_END: int = 18    # 6:00 PM
+    BUSINESS_HOURS_START: int = 9  # 9:00 AM
+    BUSINESS_HOURS_END: int = 18  # 6:00 PM
     DEFAULT_TIMEZONE: str = "UTC"
     MEETING_DURATION_MINUTES: int = 30
     MIN_NOTICE_HOURS: int = 2

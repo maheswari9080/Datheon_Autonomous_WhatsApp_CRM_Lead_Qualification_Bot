@@ -1,9 +1,8 @@
 """Google Calendar API adapter implementation."""
 
-from datetime import date, datetime, time, timedelta, timezone
 import uuid
+from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
-import httpx
 
 from src.calendar.base import CalendarAdapterProtocol, TimeSlot
 from src.core.config import get_settings
@@ -44,7 +43,7 @@ class GoogleCalendarAdapter(CalendarAdapterProtocol):
         timezone_str: str = "UTC",
     ) -> list[TimeSlot]:
         """Compute available meeting slots across specified working days."""
-        now_utc = datetime.now(timezone.utc)
+        now_utc = datetime.now(UTC)
         earliest_time = now_utc + timedelta(hours=self.min_notice_hours)
         slots: list[TimeSlot] = []
 
@@ -55,10 +54,10 @@ class GoogleCalendarAdapter(CalendarAdapterProtocol):
                 continue
 
             current_slot_start = datetime.combine(
-                target_date, time(hour=self.business_start, minute=0), tzinfo=timezone.utc
+                target_date, time(hour=self.business_start, minute=0), tzinfo=UTC
             )
             day_end = datetime.combine(
-                target_date, time(hour=self.business_end, minute=0), tzinfo=timezone.utc
+                target_date, time(hour=self.business_end, minute=0), tzinfo=UTC
             )
 
             while current_slot_start + timedelta(minutes=self.slot_duration) <= day_end:
@@ -70,8 +69,16 @@ class GoogleCalendarAdapter(CalendarAdapterProtocol):
                     # Check collision against booked events
                     is_colliding = False
                     for ev in self._booked_events.values():
-                        ev_start = datetime.fromisoformat(ev["start_time"]) if isinstance(ev["start_time"], str) else ev["start_time"]
-                        ev_end = datetime.fromisoformat(ev["end_time"]) if isinstance(ev["end_time"], str) else ev["end_time"]
+                        ev_start = (
+                            datetime.fromisoformat(ev["start_time"])
+                            if isinstance(ev["start_time"], str)
+                            else ev["start_time"]
+                        )
+                        ev_end = (
+                            datetime.fromisoformat(ev["end_time"])
+                            if isinstance(ev["end_time"], str)
+                            else ev["end_time"]
+                        )
                         if ev_start < slot_end and ev_end > current_slot_start:
                             is_colliding = True
                             break
@@ -102,8 +109,16 @@ class GoogleCalendarAdapter(CalendarAdapterProtocol):
         """Create confirmed calendar event with collision guard."""
         # Double-check collision immediately before creating event (STRIDE / Concurrency check)
         for ev in self._booked_events.values():
-            ev_start = datetime.fromisoformat(ev["start_time"]) if isinstance(ev["start_time"], str) else ev["start_time"]
-            ev_end = datetime.fromisoformat(ev["end_time"]) if isinstance(ev["end_time"], str) else ev["end_time"]
+            ev_start = (
+                datetime.fromisoformat(ev["start_time"])
+                if isinstance(ev["start_time"], str)
+                else ev["start_time"]
+            )
+            ev_end = (
+                datetime.fromisoformat(ev["end_time"])
+                if isinstance(ev["end_time"], str)
+                else ev["end_time"]
+            )
             if ev_start < end_time and ev_end > start_time:
                 raise CalendarSlotUnavailableError(
                     f"Selected slot {start_time.isoformat()} was just booked by another user."
@@ -117,12 +132,14 @@ class GoogleCalendarAdapter(CalendarAdapterProtocol):
             "provider": "google",
             "lead_name": lead_name,
             "lead_phone": lead_phone,
-            "start_time": start_time.isoformat() if isinstance(start_time, datetime) else str(start_time),
+            "start_time": start_time.isoformat()
+            if isinstance(start_time, datetime)
+            else str(start_time),
             "end_time": end_time.isoformat() if isinstance(end_time, datetime) else str(end_time),
             "summary": summary,
             "meeting_url": meeting_url,
             "status": "CONFIRMED",
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
         }
 
         self._booked_events[event_id] = booking_data

@@ -1,12 +1,14 @@
 """Async database session and engine initialization."""
 
 from collections.abc import AsyncGenerator
+
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
     async_sessionmaker,
     create_async_engine,
 )
+
 from src.core.config import get_settings
 from src.database.base import Base
 

@@ -1,7 +1,7 @@
 """Booking coordinator, slot locking, and conflict resolution engine."""
 
 import time
-from datetime import date, datetime, timezone
+from datetime import date
 from typing import Any
 
 from src.calendar.base import CalendarAdapterProtocol, TimeSlot
@@ -18,7 +18,9 @@ settings = get_settings()
 class BookingScheduler:
     """Coordinates calendar slots, prevents double bookings with temporary locks, and resolves conflicts."""
 
-    def __init__(self, adapter: CalendarAdapterProtocol | None = None, lock_timeout_seconds: int = 300):
+    def __init__(
+        self, adapter: CalendarAdapterProtocol | None = None, lock_timeout_seconds: int = 300
+    ):
         self.lock_timeout_seconds = lock_timeout_seconds
         # Temporary slot reservations: slot_id -> {"phone": str, "locked_at": float, "slot": TimeSlot}
         self._slot_locks: dict[str, dict[str, Any]] = {}
@@ -47,7 +49,11 @@ class BookingScheduler:
     def _cleanup_expired_locks(self) -> None:
         """Release slot locks that exceeded lock_timeout_seconds."""
         now = time.time()
-        expired = [k for k, v in self._slot_locks.items() if now - v["locked_at"] > self.lock_timeout_seconds]
+        expired = [
+            k
+            for k, v in self._slot_locks.items()
+            if now - v["locked_at"] > self.lock_timeout_seconds
+        ]
         for k in expired:
             logger.info(f"Released expired lock on slot: {k}")
             self._slot_locks.pop(k, None)
@@ -104,7 +110,9 @@ class BookingScheduler:
         self._cleanup_expired_locks()
         lock = self._slot_locks.get(slot.slot_id)
         if lock and lock["phone"] != lead_phone:
-            raise CalendarSlotUnavailableError(f"Slot {slot.formatted_display} is no longer reserved for this user.")
+            raise CalendarSlotUnavailableError(
+                f"Slot {slot.formatted_display} is no longer reserved for this user."
+            )
 
         try:
             booking = await self.adapter.create_booking(
