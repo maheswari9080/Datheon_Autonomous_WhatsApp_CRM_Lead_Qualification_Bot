@@ -84,6 +84,9 @@ class TransactionalOutboxWorker:
             elif event.event_type == "ESCALATION_ALERT":
                 logger.info(f"[Outbox Dispatch] Escalation notification dispatched: {event.payload}")
 
+            else:
+                raise ValueError(f"Unsupported outbox event type: {event.event_type}")
+
             # Mark processed
             event.status = "PROCESSED"
             event.processed_at = datetime.now(timezone.utc)
