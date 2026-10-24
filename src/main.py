@@ -59,6 +59,8 @@ app.add_middleware(
 
 # Include Routers
 app.include_router(webhook_router)
+from src.api.admin import admin_router
+app.include_router(admin_router)
 
 
 @app.get("/health", tags=["Health"])
