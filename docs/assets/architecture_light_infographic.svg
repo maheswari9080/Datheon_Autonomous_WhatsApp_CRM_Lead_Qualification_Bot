@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .card { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1.5; rx: 12px; }
+      .card-accent { fill: #ffffff; stroke: #2563eb; stroke-width: 2; rx: 12px; }
+      .card-green { fill: #ffffff; stroke: #10b981; stroke-width: 2; rx: 12px; }
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 700; fill: #0f172a; }
+      .subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 500; fill: #64748b; font-size: 13px; }
+      .badge-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 600; font-size: 11px; }
+      .item-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 400; fill: #334155; font-size: 12px; }
+      .arrow { stroke: #94a3b8; stroke-width: 2; fill: none; stroke-dasharray: 4,4; }
+      .arrow-solid { stroke: #2563eb; stroke-width: 2; fill: none; }
+      .marker { fill: #2563eb; }
+    </style>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#2563eb" />
+    </marker>
+    <marker id="arrowhead-green" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#10b981" />
+    </marker>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.05" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="680" class="bg" />
+
+  <!-- Header Banner -->
+  <rect x="40" y="30" width="1120" height="70" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)" />
+  <circle cx="80" cy="65" r="22" fill="#25D366" />
+  <path d="M72 58 C72 54 88 54 88 58 C88 66 76 64 76 72" stroke="#ffffff" stroke-width="2.5" fill="none" stroke-linecap="round" />
+  <circle cx="76" cy="74" r="1.5" fill="#ffffff" />
+  <text x="120" y="58" class="title" font-size="20">Datheon Autonomous WhatsApp CRM &amp; Lead Qualification Engine</text>
+  <text x="120" y="78" class="subtitle">End-to-End Event-Driven Architecture • Python 3.12 • FastAPI • Pydantic V2 • SQLAlchemy 2.0 Async • STRIDE</text>
+
+  <!-- 1. WhatsApp Ingestion Layer -->
+  <g transform="translate(40, 130)">
+    <rect width="240" height="230" class="card" filter="url(#shadow)" />
+    <rect x="16" y="16" width="90" height="22" rx="6" fill="#ecfdf5" />
+    <text x="24" y="31" class="badge-text" fill="#059669">INGESTION</text>
+    <text x="16" y="62" class="title" font-size="16">Meta Webhook</text>
+    <text x="16" y="80" class="subtitle">FastACK &amp; Signature</text>
+    <line x1="16" y1="95" x2="224" y2="95" stroke="#f1f5f9" stroke-width="1.5" />
+    <text x="16" y="120" class="item-text">🔒 HMAC-SHA256 constant-time</text>
+    <text x="16" y="145" class="item-text">⚡ Fast 200 OK ACK (&lt;200ms)</text>
+    <text x="16" y="170" class="item-text">🔄 Dual-layer deduplication (LRU)</text>
+    <text x="16" y="195" class="item-text">📦 Status receipts isolated</text>
+    <text x="16" y="220" class="item-text">🆔 UUIDv7 Correlation ID</text>
+  </g>
+
+  <!-- Arrow 1 -> 2 -->
+  <path d="M280 245 L320 245" class="arrow-solid" marker-end="url(#arrowhead)" />
+
+  <!-- 2. Security & Guardrails Layer -->
+  <g transform="translate(330, 130)">
+    <rect width="240" height="230" class="card-accent" filter="url(#shadow)" />
+    <rect x="16" y="16" width="90" height="22" rx="6" fill="#eff6ff" />
+    <text x="24" y="31" class="badge-text" fill="#2563eb">SECURITY</text>
+    <text x="16" y="62" class="title" font-size="16">Input Guardrails</text>
+    <text x="16" y="80" class="subtitle">STRIDE Defense Layer</text>
+    <line x1="16" y1="95" x2="224" y2="95" stroke="#f1f5f9" stroke-width="1.5" />
+    <text x="16" y="120" class="item-text">🛡️ Prompt Injection Shield</text>
+    <text x="16" y="145" class="item-text">🚫 Jailbreak &amp; Override Defense</text>
+    <text x="16" y="170" class="item-text">🎭 Cross-turn contradiction check</text>
+    <text x="16" y="195" class="item-text">🔐 PII Scrubbing &amp; Phone Redact</text>
+    <text x="16" y="220" class="item-text">⚖️ Separation of extraction &amp; policy</text>
+  </g>
+
+  <!-- Arrow 2 -> 3 -->
+  <path d="M570 245 L610 245" class="arrow-solid" marker-end="url(#arrowhead)" />
+
+  <!-- 3. AI Extraction & Policy Layer -->
+  <g transform="translate(620, 130)">
+    <rect width="240" height="230" class="card" filter="url(#shadow)" />
+    <rect x="16" y="16" width="90" height="22" rx="6" fill="#fdf4ff" />
+    <text x="24" y="31" class="badge-text" fill="#c026d3">INTELLIGENCE</text>
+    <text x="16" y="62" class="title" font-size="16">AI Extraction</text>
+    <text x="16" y="80" class="subtitle">Deterministic Rules</text>
+    <line x1="16" y1="95" x2="224" y2="95" stroke="#f1f5f9" stroke-width="1.5" />
+    <text x="16" y="120" class="item-text">📋 Pydantic V2 Schema Validation</text>
+    <text x="16" y="145" class="item-text">💰 Currency Normalization</text>
+    <text x="16" y="170" class="item-text">🎯 Min. $1,000 Budget Threshold</text>
+    <text x="16" y="195" class="item-text">👔 Decision Maker Verification</text>
+    <text x="16" y="220" class="item-text">❓ Max 1 follow-up question/turn</text>
+  </g>
+
+  <!-- Arrow 3 -> 4 -->
+  <path d="M860 245 L900 245" class="arrow-solid" marker-end="url(#arrowhead)" />
+
+  <!-- 4. Finite State Machine -->
+  <g transform="translate(910, 130)">
+    <rect width="250" height="230" class="card-green" filter="url(#shadow)" />
+    <rect x="16" y="16" width="80" height="22" rx="6" fill="#ecfdf5" />
+    <text x="24" y="31" class="badge-text" fill="#059669">FSM CORE</text>
+    <text x="16" y="62" class="title" font-size="16">State Machine</text>
+    <text x="16" y="80" class="subtitle">Deterministic Flow</text>
+    <line x1="16" y1="95" x2="234" y2="95" stroke="#f1f5f9" stroke-width="1.5" />
+    <text x="16" y="120" class="item-text">🟢 NEW ➔ GREETING ➔ DISCOVERY</text>
+    <text x="16" y="145" class="item-text">🟡 NEEDS_INFORMATION Loop</text>
+    <text x="16" y="170" class="item-text">🔵 QUALIFIED ➔ BOOKING ➔ BOOKED</text>
+    <text x="16" y="195" class="item-text">🔴 NOT_QUALIFIED ➔ CLOSED</text>
+    <text x="16" y="220" class="item-text">🚨 HUMAN_HANDOFF (Any State)</text>
+  </g>
+
+  <!-- Bottom Row: Integrations & Reliability -->
+
+  <!-- 5. Calendar Scheduling -->
+  <g transform="translate(40, 390)">
+    <rect width="345" height="250" class="card" filter="url(#shadow)" />
+    <rect x="16" y="16" width="85" height="22" rx="6" fill="#eff6ff" />
+    <text x="24" y="31" class="badge-text" fill="#2563eb">CALENDAR</text>
+    <text x="16" y="62" class="title" font-size="16">Autonomous Scheduling</text>
+    <text x="16" y="80" class="subtitle">Google Calendar &amp; Cal.com API</text>
+    <line x1="16" y1="95" x2="329" y2="95" stroke="#f1f5f9" stroke-width="1.5" />
+    <text x="16" y="120" class="item-text">⏰ Configurable Business Hours (9am-6pm)</text>
+    <text x="16" y="145" class="item-text">⏱️ 30m Meeting Slots &amp; 15m Buffer Times</text>
+    <text x="16" y="170" class="item-text">🔒 5-Minute Slot Reservation Lock</text>
+    <text x="16" y="195" class="item-text">🚫 Concurrent Double-Booking Prevention</text>
+    <text x="16" y="220" class="item-text">🔗 Instant Google Meet / Cal.com URL</text>
+  </g>
+
+  <!-- 6. Transactional Outbox & CRM -->
+  <g transform="translate(425, 390)">
+    <rect width="350" height="250" class="card" filter="url(#shadow)" />
+    <rect x="16" y="16" width="95" height="22" rx="6" fill="#fef3c7" />
+    <text x="24" y="31" class="badge-text" fill="#d97706">RELIABILITY</text>
+    <text x="16" y="62" class="title" font-size="16">Transactional Outbox</text>
+    <text x="16" y="80" class="subtitle">Airtable CRM Sync &amp; Retries</text>
+    <line x1="16" y1="95" x2="334" y2="95" stroke="#f1f5f9" stroke-width="1.5" />
+    <text x="16" y="120" class="item-text">💾 ACID Same-Transaction DB Enqueue</text>
+    <text x="16" y="145" class="item-text">🔄 Exponential Backoff (2s, 4s, 8s, 16s)</text>
+    <text x="16" y="170" class="item-text">📬 Idempotent CRM Upsert by Phone Key</text>
+    <text x="16" y="195" class="item-text">💀 Dead-Letter Queue upon 5 Failures</text>
+    <text x="16" y="220" class="item-text">📊 Airtable REST API Real-Time Sync</text>
+  </g>
+
+  <!-- 7. Human Escalation & Governance -->
+  <g transform="translate(815, 390)">
+    <rect width="345" height="250" class="card" filter="url(#shadow)" />
+    <rect x="16" y="16" width="90" height="22" rx="6" fill="#fee2e2" />
+    <text x="24" y="31" class="badge-text" fill="#dc2626">GOVERNANCE</text>
+    <text x="16" y="62" class="title" font-size="16">Human Handoff</text>
+    <text x="16" y="80" class="subtitle">Slack Alerts &amp; Operator API</text>
+    <line x1="16" y1="95" x2="329" y2="95" stroke="#f1f5f9" stroke-width="1.5" />
+    <text x="16" y="120" class="item-text">🗣️ Explicit Request &amp; Sentiment Detection</text>
+    <text x="16" y="145" class="item-text">🛑 Immediate Bot Messaging Suspension</text>
+    <text x="16" y="170" class="item-text">💬 Slack Incident Dossier Card Dispatch</text>
+    <text x="16" y="195" class="item-text">🛡️ Alert Storming Deduplication</text>
+    <text x="16" y="220" class="item-text">🔑 Admin API: Inspect &amp; Resume Bot</text>
+  </g>
+
+  <!-- Connecting Arrows Between Layers -->
+  <path d="M1035 360 L1035 375 L985 375 L985 390" class="arrow-solid" stroke="#dc2626" marker-end="url(#arrowhead)" />
+  <path d="M1035 360 L1035 375 L600 375 L600 390" class="arrow-solid" stroke="#d97706" marker-end="url(#arrowhead)" />
+  <path d="M1035 360 L1035 375 L210 375 L210 390" class="arrow-solid" marker-end="url(#arrowhead-green)" />
+
+</svg>

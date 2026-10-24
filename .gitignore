@@ -72,3 +72,8 @@ cover/
 # Antigravity & Agent workspace artifacts
 .agents/
 .gemini/
+
+# Documentation & Public Assets (explicitly tracked)
+!docs/assets/
+!docs/assets/*
+!image.png
