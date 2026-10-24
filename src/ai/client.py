@@ -69,12 +69,18 @@ class MockRuleBasedLLMClient:
         if company_match and not lead.company_name:
             lead.company_name = company_match.group(1).title()
 
-        # 4. Budget extraction
-        budget_match = re.search(r"(\$?\d+(?:,\d+)*(?:\.\d+)?\s*(?:k|m|usd|dollars)?)", combined_text, re.IGNORECASE)
+        # 4. Budget extraction (look for dollar sign, budget keyword, or explicit currency)
+        budget_match = re.search(
+            r"\$\s*(\d+(?:,\d+)*(?:\.\d+)?\s*(?:k|m)?)|(?:budget|allocated|funds)(?:\s*(?:is|of|around|about|:))?\s*\$?\s*(\d+(?:,\d+)*(?:\.\d+)?\s*(?:k|m|usd|dollars)?)|\b(\d+(?:,\d+)*(?:\.\d+)?\s*(?:k|m|usd|dollars))\b",
+            combined_text,
+            re.IGNORECASE,
+        )
         if budget_match and not lead.budget_amount:
-            parsed_val = ExtractedLeadData.parse_numeric_budget(budget_match.group(1))
-            if parsed_val:
-                lead.budget_amount = parsed_val
+            raw_match = budget_match.group(1) or budget_match.group(2) or budget_match.group(3)
+            if raw_match:
+                parsed_val = ExtractedLeadData.parse_numeric_budget(raw_match)
+                if parsed_val:
+                    lead.budget_amount = parsed_val
 
         # 5. Company size extraction
         size_match = re.search(r"(\d+(?:-\d+)?|\d+\+)\s*(?:people|employees|team members|staff)", combined_text, re.IGNORECASE)

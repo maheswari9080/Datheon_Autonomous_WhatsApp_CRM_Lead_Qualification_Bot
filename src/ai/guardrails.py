@@ -9,11 +9,11 @@ logger = get_logger(__name__)
 # Patterns matching prompt injection, jailbreaks, and system override attempts
 INJECTION_PATTERNS = [
     re.compile(r"ignore\s+(all\s+)?(previous|prior|above)\s+instructions?", re.IGNORECASE),
-    re.compile(r"disregard\s+(the\s+)?(rules|criteria|policies)", re.IGNORECASE),
+    re.compile(r"disregard\s+(the\s+)?(\w+\s+)?(rules|criteria|policies)", re.IGNORECASE),
     re.compile(r"system\s+override", re.IGNORECASE),
     re.compile(r"bypass\s+(qualification|verification|auth)", re.IGNORECASE),
     re.compile(r"you\s+are\s+now\s+(in\s+developer\s+mode|dan|an\s+unrestricted\s+ai)", re.IGNORECASE),
-    re.compile(r"format\s+drive|drop\s+table|delete\s+from|<script.*?>", re.IGNORECASE),
+    re.compile(r"format\s+drive|drop\s+table|delete\s+from|<\s*script.*?>|<\s*/\s*script\s*>", re.IGNORECASE),
     re.compile(r"grant\s+admin|sudo\s+make", re.IGNORECASE),
 ]
 
